@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("MONGODB_URI:", process.env.MONGODB_URI);
 
 import app from "./app";
 import { connectDB } from "./config/mongodb";
