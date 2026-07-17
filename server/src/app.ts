@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes";
 import exploreToolsRoute from "./routes/exploreTools.route";
+import aiRoutes from "./routes/ai.routes";
 
 const app = express();
 
@@ -21,6 +22,15 @@ app.use("/api/user", userRoutes);
 
 
 app.use("/api/exploreTools", exploreToolsRoute);
+
+
+
+app.use(
+"/api/ai",
+aiRoutes
+);
+
+
 
 
 app.get("/", (req, res) => {
