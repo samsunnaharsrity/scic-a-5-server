@@ -1,29 +1,78 @@
-import {Request,Response} from "express";
-import {db} from "../config/mongodb";
-import { ObjectId } from "mongodb";
+import { Request, Response } from "express";
+import { db } from "../config/mongodb";
 
-// get all agents
 
-export const getAgents = async(
+
+// Create Agent
+
+export const createAgent = async(
 req:Request,
 res:Response
 )=>{
 
-
 try{
 
+const {
+name,
+description,
+category,
+model,
+prompt,
+userEmail
+}=req.body;
 
-const agents =
-await db()
+
+
+const database = db();
+
+
+// Create Agent
+
+const result = await database
 .collection("agents")
-.find({})
-.toArray();
+.insertOne({
+
+name,
+description,
+category,
+model,
+prompt,
+userEmail,
+
+createdAt:new Date()
+
+});
 
 
 
-res.json({
+
+// Save Activity Log
+
+await database
+.collection("activities")
+.insertOne({
+
+userEmail,
+
+action:"Created AI Agent",
+
+description:`Created ${name} AI agent`,
+
+createdAt:new Date()
+
+});
+
+
+
+
+res.status(201).json({
+
 success:true,
-agents
+
+message:"Agent created successfully",
+
+agentId:result.insertedId
+
 });
 
 
@@ -33,44 +82,56 @@ catch(error:any){
 console.log(error);
 
 res.status(500).json({
+
 success:false,
+
 message:error.message
+
 });
 
 }
-
 
 };
 
 
 
 
-// single agent
 
-export const getAgentById = async(
-req:Request,
-res:Response
+// Get My Agents
+
+export const getMyAgents = async(
+req: Request,
+res: Response
 )=>{
 
 
 try{
 
 
-const {id}=req.params;
+const email = decodeURIComponent(
+  req.params.email as string
+);
 
 
-const agent =
-await db()
+
+const agents = await db()
 .collection("agents")
-.findOne({
-  _id: new ObjectId(id)
-});
+.find({
+ userEmail: email
+})
+.sort({
+ createdAt:-1
+})
+.toArray();
 
 
 
 res.json({
+
 success:true,
-agent
+
+agents
+
 });
 
 
@@ -80,8 +141,11 @@ catch(error:any){
 console.log(error);
 
 res.status(500).json({
+
 success:false,
+
 message:error.message
+
 });
 
 }

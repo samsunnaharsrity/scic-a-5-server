@@ -1,16 +1,18 @@
-import express from "express";
-import {
- getAgents,
- getAgentById
-} from "../controllers/agent.controller";
+import { Router } from "express";
+import { createAgent, getMyAgents } from "../controllers/agent.controller";
+
+const router = Router();
 
 
-const router = express.Router();
+console.log("Agent route loaded");
 
 
-router.get("/", getAgents);
+router.post("/", createAgent);
 
-router.get("/:id", getAgentById);
 
+router.get(
+"/my/:email",
+getMyAgents
+);
 
 export default router;

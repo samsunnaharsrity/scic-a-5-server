@@ -5,6 +5,11 @@ import userRoutes from "./routes/user.routes";
 import exploreToolsRoute from "./routes/exploreTools.route";
 import aiRoutes from "./routes/ai.routes";
 import settingsRoute from "./routes/settings.route";
+import agentRoutes from "./routes/agent.route";
+import dashboardRouter from "./routes/userDashboard.routes";
+
+
+
 
 const app = express();
 
@@ -33,14 +38,14 @@ app.use("/api/settings", settingsRoute);
 
 
 
-// app.use(
-// "/api/agents",
-// agentRoutes
-// );
+app.use(
+"/api/agents",
+agentRoutes
+);
 
 
 
-
+app.use("/api/userDashboard", dashboardRouter);
 
 
 app.get("/", (req, res) => {
