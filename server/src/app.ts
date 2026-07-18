@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes";
 import exploreToolsRoute from "./routes/exploreTools.route";
 import aiRoutes from "./routes/ai.routes";
+import settingsRoute from "./routes/settings.route";
 
 const app = express();
 
@@ -25,10 +26,19 @@ app.use("/api/exploreTools", exploreToolsRoute);
 
 
 
-app.use(
-"/api/ai",
-aiRoutes
-);
+app.use("/api/ai", aiRoutes);
+
+
+app.use("/api/settings", settingsRoute);
+
+
+
+// app.use(
+// "/api/agents",
+// agentRoutes
+// );
+
+
 
 
 

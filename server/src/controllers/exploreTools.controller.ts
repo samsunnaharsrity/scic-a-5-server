@@ -68,10 +68,13 @@ export const getSingleTool = async (
     }
 
 
-    return res.status(200).json({
-      success: true,
-      data: tool,
-    });
+return res.status(200).json({
+  success: true,
+  data: {
+    ...tool,
+    reviews: tool.reviews || []
+  },
+});
 
 
   } catch (error) {
