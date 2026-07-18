@@ -39,36 +39,32 @@ const requests = await database
 
 
 
-const activities = await database
-.collection("activities")
-.find({
- userEmail:email
-})
-.sort({
- createdAt:-1
-})
-.limit(5)
-.toArray();
+const recentAgents = await database
+  .collection("agents")
+  .find({ userEmail: email })
+  .sort({ createdAt: -1 })
+  .limit(5)
+  .toArray();
 
-
+const activities = recentAgents.map((agent) => ({
+  _id: agent._id,
+  title: agent.name,
+  action: "Created AI Agent",
+  icon: "bot",
+  createdAt: agent.createdAt,
+}));
 
 res.json({
-
-user:{
- name:user?.name || "User"
-},
-
-
-stats:{
- agents,
- requests,
- usage:"78%",
- plan:user?.plan || "Free"
-},
-
-
-activities
-
+  user: {
+    name: user?.name || "User",
+  },
+  stats: {
+    agents,
+    requests,
+    usage: "78%",
+    plan: user?.plan || "Free",
+  },
+  activities,
 });
 
 
