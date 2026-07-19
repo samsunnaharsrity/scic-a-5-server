@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../config/mongodb";
+import { connectDB, db } from "../config/mongodb";
 import { ObjectId } from "mongodb";
 
 
@@ -8,6 +8,10 @@ req:Request<{id:string}>,
 res:Response
 )=>{
   try {
+
+
+const database = await connectDB();
+
     const tools = await db()
       .collection("tools")
       .find({})
