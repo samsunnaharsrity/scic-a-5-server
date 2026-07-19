@@ -59,10 +59,10 @@ adminSettingsRoute
 
 
 
-app.use(
-"/api/training",
-trainingRoute
-);
+// app.use(
+// "/api/training",
+// trainingRoute
+// );
 
 
 
