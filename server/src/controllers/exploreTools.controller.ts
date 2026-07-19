@@ -15,7 +15,7 @@ res:Response
 
     res.status(200).json({
       success: true,
-      data: tools,
+      tools,
     });
   } catch (error) {
     console.error("Get Tools Error:", error);
