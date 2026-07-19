@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
+import { generateContent, getControlCenter } from "../controllers/ai.controller";
 
 const router = Router();
 
@@ -127,6 +128,17 @@ ${prompt}
   }
 
 });
+
+router.post(
+"/content",
+generateContent
+);
+
+
+router.get(
+"/control-center",
+getControlCenter
+);
 
 
 export default router;

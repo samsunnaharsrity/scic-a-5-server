@@ -7,6 +7,7 @@ import aiRoutes from "./routes/ai.routes";
 import settingsRoute from "./routes/settings.route";
 import agentRoutes from "./routes/agent.route";
 import dashboardRouter from "./routes/userDashboard.routes";
+import adminSettingsRoute from "./routes/adminSettings.route";
 
 
 
@@ -46,6 +47,12 @@ agentRoutes
 
 
 app.use("/api/userDashboard", dashboardRouter);
+
+
+app.use(
+"/api/admin",
+adminSettingsRoute
+);
 
 
 app.get("/", (req, res) => {

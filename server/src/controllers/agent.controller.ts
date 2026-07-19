@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../config/mongodb";
+import { ObjectId } from "mongodb";
 
 
 
@@ -97,7 +98,7 @@ message:error.message
 
 
 
-// Get My Agents
+// Get User Agents
 
 export const getMyAgents = async(
 req: Request,
@@ -150,5 +151,193 @@ message:error.message
 
 }
 
+
+};
+
+
+
+
+// Get All Agents
+export const getAllAgents = async(
+req:Request,
+res:Response
+)=>{
+
+try{
+
+
+const agents =
+await db()
+.collection("agents")
+.find({})
+.toArray();
+
+
+
+res.json(agents);
+
+
+
+}catch(error:any){
+
+console.log(error);
+
+
+res.status(500).json({
+
+message:"Failed to load agents"
+
+});
+
+
+}
+
+};
+
+
+// UPDATE AGENT
+
+
+
+export const updateAgent = async(
+req:Request,
+res:Response
+)=>{
+
+try{
+
+const {id}=req.params;
+
+
+console.log("UPDATE ID:", id);
+
+
+if(!ObjectId.isValid(id)){
+
+return res.status(400).json({
+
+success:false,
+message:"Invalid MongoDB ID"
+
+});
+
+}
+
+
+
+const result = await db()
+.collection("agents")
+.updateOne(
+
+{
+_id:new ObjectId(id)
+},
+
+{
+
+$set:{
+
+name:req.body.name,
+model:req.body.model,
+status:req.body.status,
+tasks:req.body.tasks,
+icon:req.body.icon,
+updatedAt:new Date()
+
+}
+
+}
+
+);
+
+
+
+res.json({
+
+success:true,
+result
+
+});
+
+
+}catch(error:any){
+
+console.log(error);
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
+
+};
+
+
+
+
+
+
+// DELETE AGENT
+
+
+export const deleteAgent = async(
+req:Request,
+res:Response
+)=>{
+
+try{
+
+const {id}=req.params;
+
+
+console.log("DELETE ID:",id);
+
+
+if(!ObjectId.isValid(id)){
+
+return res.status(400).json({
+
+success:false,
+message:"Invalid MongoDB ID"
+
+});
+
+}
+
+
+
+const result = await db()
+.collection("agents")
+.deleteOne({
+
+_id:new ObjectId(id)
+
+});
+
+
+
+res.json({
+
+success:true,
+result
+
+});
+
+
+}catch(error:any){
+
+console.log(error);
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
 
 };
