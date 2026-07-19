@@ -3,7 +3,10 @@ import { db } from "../config/mongodb";
 import { ObjectId } from "mongodb";
 
 
-export const getAllTools = async (req: Request, res: Response) => {
+export const getAllTool = async(
+req:Request<{id:string}>,
+res:Response
+)=>{
   try {
     const tools = await db()
       .collection("tools")
@@ -32,10 +35,11 @@ export const getAllTools = async (req: Request, res: Response) => {
 
 
 
-export const getSingleTool = async (
-  req: Request,
-  res: Response
-) => {
+
+export const getSingleTool = async(
+req:Request<{id:string}>,
+res:Response
+)=>{
 
   try {
 
