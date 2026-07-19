@@ -157,10 +157,10 @@ message:"Prompt create failed"
 // UPDATE PROMPT
 
 
-export const updatePrompt = async(
-req:Request,
-res:Response
-)=>{
+export const updatePrompt = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
 
 
 try{
@@ -243,10 +243,10 @@ message:"Update failed"
 // DELETE PROMPT
 
 
-export const deletePrompt = async(
-req:Request,
-res:Response
-)=>{
+export const deletePrompt = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
 
 
 try{
