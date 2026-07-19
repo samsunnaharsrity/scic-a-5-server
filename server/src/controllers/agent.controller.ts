@@ -206,8 +206,7 @@ res:Response
 
 try{
 
-const {id}=req.params;
-
+const id = req.params.id as string;
 
 console.log("UPDATE ID:", id);
 
@@ -290,8 +289,7 @@ res:Response
 
 try{
 
-const {id}=req.params;
-
+const id = String(req.params.id);
 
 console.log("DELETE ID:",id);
 
