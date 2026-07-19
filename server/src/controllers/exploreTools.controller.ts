@@ -3,7 +3,7 @@ import { db } from "../config/mongodb";
 import { ObjectId } from "mongodb";
 
 
-export const getAllTool = async(
+export const getAllTools = async(
 req:Request<{id:string}>,
 res:Response
 )=>{
