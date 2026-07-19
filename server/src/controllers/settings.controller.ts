@@ -61,8 +61,7 @@ const settingsCollection =
   db().collection<ISettings>("settings");
 
 
-const { userId } = req.params;
-
+const userId = decodeURIComponent(req.params.userId);
 
 let settings: ISettings | null =
   await settingsCollection.findOne({

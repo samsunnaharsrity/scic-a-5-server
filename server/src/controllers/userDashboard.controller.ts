@@ -25,9 +25,7 @@ const user = await database
 
 const agents = await database
 .collection("agents")
-.countDocuments({
- userEmail:email
-});
+.countDocuments();
 
 
 
@@ -40,11 +38,14 @@ const requests = await database
 
 
 const recentAgents = await database
-  .collection("agents")
-  .find({ userEmail: email })
-  .sort({ createdAt: -1 })
-  .limit(5)
-  .toArray();
+.collection("agents")
+.find({})
+.sort({createdAt:-1})
+.limit(5)
+.toArray();
+
+
+console.log("RECENT AGENTS:", recentAgents);
 
 const activities = recentAgents.map((agent) => ({
   _id: agent._id,

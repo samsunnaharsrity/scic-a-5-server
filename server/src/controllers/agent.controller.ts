@@ -101,21 +101,22 @@ message:error.message
 // Get User Agents
 
 export const getMyAgents = async(
-req: Request,
+req: Request<{email:string}>,
 res: Response
 )=>{
 
-
 try{
 
-
-const email = decodeURIComponent(
-  req.params.email as string
-);
+const {email}=req.params;
 
 
+console.log("REQUEST EMAIL:", email);
 
-const agents = await db()
+
+const database = db();
+
+
+const agents = await database
 .collection("agents")
 .find({
  userEmail: email
@@ -124,6 +125,9 @@ const agents = await db()
  createdAt:-1
 })
 .toArray();
+
+
+console.log("FOUND AGENTS:", agents);
 
 
 
@@ -136,10 +140,10 @@ agents
 });
 
 
-}
-catch(error:any){
+}catch(error:any){
 
-console.log(error);
+console.log("GET MY AGENTS ERROR:",error);
+
 
 res.status(500).json({
 
@@ -151,9 +155,7 @@ message:error.message
 
 }
 
-
 };
-
 
 
 
