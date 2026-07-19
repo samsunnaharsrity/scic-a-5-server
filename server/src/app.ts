@@ -17,15 +17,31 @@ import promptRoute from "./routes/prompt.route";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://scic-a-5.vercel.app"
+];
+
+
 app.use(
   cors({
-        origin:[
-      "http://localhost:3000",
-      "https://scic-a-5.vercel.app"
-    ],
-    credentials: true,              
+    origin: (origin, callback) => {
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked"));
+    },
+
+    credentials:true
   })
-);app.use(express.json());
+);
+app.use(express.json());
 app.use(cookieParser());
 
 
