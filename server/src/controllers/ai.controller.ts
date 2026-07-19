@@ -1,6 +1,7 @@
 import {Request,Response} from "express";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import { generateAI } from "../services/groq.service";
+import { db } from "../config/mongodb";
 
 
 const genAI =
@@ -10,34 +11,99 @@ process.env.OPENAI_API_KEY!
 
 
 
-export const chatAI = async (req: Request, res: Response) => {
-  try {
-    console.log("Body:", req.body);
-    console.log("API KEY:", process.env.GEMINI_API_KEY);
+export const chatAI = async (
+req:Request,
+res:Response
+)=>{
 
-    const { message } = req.body;
+try{
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-    });
 
-    const result = await model.generateContent(message);
+const {
+message,
+email
+}=req.body;
 
-    const reply = result.response.text();
 
-    res.json({
-      success: true,
-      reply,
-    });
-  } catch (error) {
-    console.error("Gemini Error:", error);
 
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-};
+console.log(
+"EMAIL FROM FRONTEND:",
+email
+);
+
+
+
+const model = genAI.getGenerativeModel({
+
+model:"gemini-2.0-flash"
+
+});
+
+
+
+const result =
+await model.generateContent(message);
+
+
+
+const reply =
+result.response.text();
+
+
+console.log("BEFORE SAVE");
+
+
+
+const saveResult = await db()
+.collection("chat_history")
+.insertOne({
+
+email,
+
+title: message.substring(0,50),
+
+message: reply,
+
+tool:"AI Chat Assistant",
+
+createdAt:new Date()
+
+});
+
+
+
+console.log(
+"CHAT SAVED ID:",
+saveResult.insertedId
+);
+
+
+
+res.json({
+
+success:true,
+
+reply
+
+});
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+
+res.status(500).json({
+
+success:false
+
+});
+
+}
+
+}
 
 
 // CONTENT GENERATOR
@@ -167,3 +233,6 @@ activities:[
 
 
 };
+
+
+

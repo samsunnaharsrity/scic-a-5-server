@@ -11,6 +11,7 @@ import adminSettingsRoute from "./routes/adminSettings.route";
 import trainingRoute from "./routes/training.route";
 import aiAnalyticsRoute from "./routes/aiAnalytics.route";
 import promptRoute from "./routes/prompt.route";
+import analyticsRoute from "./routes/analytics.route";
 
 
 
@@ -81,6 +82,16 @@ app.use(
 "/api/prompts",
 promptRoute
 );
+
+
+
+app.use(
+    "/api/analytics",
+    analyticsRoute
+);
+
+
+
 
 
 
