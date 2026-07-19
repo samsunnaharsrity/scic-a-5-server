@@ -19,10 +19,7 @@ interface TrainingDocument {
   updatedAt?: Date;
 }
 
-// Multer Request
-interface MulterRequest extends Request {
-  file?: Express.Multer.File;
-}
+
 
 // ================= GET TRAINING DATA =================
 
@@ -67,50 +64,36 @@ export const getTrainingData = async (
 // ================= UPLOAD TRAINING FILE =================
 
 export const uploadTrainingFile = async (
-  req: MulterRequest,
+  req: Request,
   res: Response
 ) => {
   try {
+    const fileReq = req as Request & {
+      file?: {
+        originalname: string;
+        mimetype: string;
+        size: number;
+        path: string;
+      };
+    };
+
     const { email } = req.body;
 
-    if (!req.file) {
+    if (!fileReq.file) {
       return res.status(400).json({
         message: "No file uploaded",
       });
     }
 
     const file: UploadedFile = {
-      name: req.file.originalname,
-      type: req.file.mimetype,
-      size: req.file.size,
-      path: req.file.path,
+      name: fileReq.file.originalname,
+      type: fileReq.file.mimetype,
+      size: fileReq.file.size,
+      path: fileReq.file.path,
       uploadedAt: new Date(),
     };
 
-    const collection = db().collection<TrainingDocument>("training");
-
-    await collection.updateOne(
-      {
-        userEmail: email,
-      },
-      {
-        $push: {
-          files: file,
-        },
-        $set: {
-          updatedAt: new Date(),
-        },
-      },
-      {
-        upsert: true,
-      }
-    );
-
-    res.json({
-      success: true,
-      message: "File uploaded",
-      file,
-    });
+    // ...
   } catch (error: any) {
     res.status(500).json({
       message: error.message,
