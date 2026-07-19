@@ -11,56 +11,41 @@ process.env.OPENAI_API_KEY!
 
 
 
-export const chatAI = async (
-req:Request,
-res:Response
+export const chatAI = async(
+ req:Request,
+ res:Response
 )=>{
 
 try{
 
 
+console.log("BODY:", req.body);
+
+
 const {
-message,
-email
+ message,
+ email
 }=req.body;
 
 
-
-console.log(
-"EMAIL FROM FRONTEND:",
-email
-);
+console.log("EMAIL:",email);
 
 
 
-const model = genAI.getGenerativeModel({
-
-model:"gemini-2.0-flash"
-
-});
+const reply = await generateAI(message);
 
 
-
-const result =
-await model.generateContent(message);
+console.log("AI REPLY GENERATED");
 
 
 
-const reply =
-result.response.text();
-
-
-console.log("BEFORE SAVE");
-
-
-
-const saveResult = await db()
+const saved = await db()
 .collection("chat_history")
 .insertOne({
 
-email,
+userEmail: email,
 
-title: message.substring(0,50),
+title: message.slice(0,40),
 
 message: reply,
 
@@ -71,39 +56,28 @@ createdAt:new Date()
 });
 
 
-
-console.log(
-"CHAT SAVED ID:",
-saveResult.insertedId
-);
+console.log("SAVED:", saved);
 
 
 
 res.json({
-
 success:true,
-
 reply
-
 });
-
 
 
 }
 catch(error){
 
-console.log(error);
-
+console.log("ERROR:",error);
 
 res.status(500).json({
-
 success:false
-
 });
 
 }
 
-}
+};
 
 
 // CONTENT GENERATOR

@@ -12,7 +12,9 @@ import trainingRoute from "./routes/training.route";
 import aiAnalyticsRoute from "./routes/aiAnalytics.route";
 import promptRoute from "./routes/prompt.route";
 import analyticsRoute from "./routes/analytics.route";
-
+import reviewRoutes from "./routes/review.routes";
+import templateRoutes from "./routes/template.route";
+import chatHistoryRoute from "./routes/chatHistory.route";
 
 
 
@@ -92,7 +94,19 @@ app.use(
 
 
 
+app.use("/api", reviewRoutes);
 
+
+
+app.use(
+"/api",
+chatHistoryRoute
+);
+
+// app.use(
+// "/api",
+// templateRoutes
+// );
 
 
 app.get("/", (req, res) => {

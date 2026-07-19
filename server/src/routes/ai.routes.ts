@@ -1,6 +1,6 @@
 import { Router } from "express";
 import Groq from "groq-sdk";
-import { generateContent, getControlCenter } from "../controllers/ai.controller";
+import { chatAI, generateContent, getControlCenter } from "../controllers/ai.controller";
 
 const router = Router();
 
@@ -11,46 +11,10 @@ const groq = new Groq({
 
 // AI CHAT ASSISTANT
 
-router.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
-
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful AI assistant. Answer clearly and professionally.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
-
-
-    res.json({
-      reply:
-        completion.choices[0].message.content,
-    });
-
-
-  } catch (error: any) {
-
-    console.error(
-      "Groq Error:",
-      error.message
-    );
-
-    res.status(500).json({
-      message:"AI Chat Failed",
-      error:error.message,
-    });
-  }
-});
+router.post(
+"/chat",
+chatAI
+);
 
 
 

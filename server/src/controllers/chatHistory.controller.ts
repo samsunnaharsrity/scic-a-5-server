@@ -4,16 +4,13 @@ import { ObjectId } from "mongodb";
 
 
 // GET USER CHAT HISTORY
-
 export const getChatHistory = async(
 req:Request,
 res:Response
 )=>{
 
-try{
 
-
-const {email}=req.params;
+const email=req.params.email;
 
 
 const chats = await db()
@@ -28,39 +25,12 @@ const chats = await db()
 
 
 
-const formattedChats = chats.map(chat=>({
-
-...chat,
-
-_id: chat._id.toString()
-
-}));
-
-
-
 res.json({
 
 success:true,
-chats:formattedChats
+chats
 
 });
-
-
-}
-catch(error){
-
-console.log(error);
-
-
-res.status(500).json({
-
-success:false,
-message:"Failed to fetch chat history"
-
-});
-
-
-}
 
 
 };
@@ -70,7 +40,7 @@ message:"Failed to fetch chat history"
 
 
 
-// DELETE CHAT
+// DELETE SINGLE CHAT
 
 export const deleteChatHistory = async(
 req:Request,
@@ -79,9 +49,7 @@ res:Response
 
 try{
 
-
 const {email}=req.params;
-
 
 
 if(!email){
@@ -107,10 +75,12 @@ userEmail:email
 
 
 
-return res.status(200).json({
+res.json({
 
 success:true,
-message:"All chat history deleted",
+
+message:"All chats deleted",
+
 deletedCount:result.deletedCount
 
 });
@@ -119,17 +89,15 @@ deletedCount:result.deletedCount
 }
 catch(error:any){
 
+console.log(error);
 
-console.log("DELETE ERROR:",error.message);
-
-
-return res.status(500).json({
+res.status(500).json({
 
 success:false,
+
 message:error.message
 
 });
-
 
 }
 

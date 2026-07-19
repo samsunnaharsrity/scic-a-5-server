@@ -45,56 +45,127 @@ req:Request<{id:string}>,
 res:Response
 )=>{
 
-  try {
-
-    const { id } = req.params;
+try {
 
 
-    // id validation
-    if (!id || !ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid tool id",
-      });
-    }
+const {id}=req.params;
 
 
-    const tool = await db()
-      .collection("tools")
-      .findOne({
-        _id: new ObjectId(id),
-      });
+if(!id || !ObjectId.isValid(id)){
+ return res.status(400).json({
+  success:false,
+  message:"Invalid tool id"
+ });
+}
 
 
-    if (!tool) {
-
-      return res.status(404).json({
-        success: false,
-        message: "Tool not found",
-      });
-
-    }
+const database=db();
 
 
-return res.status(200).json({
-  success: true,
-  data: {
-    ...tool,
-    reviews: tool.reviews || []
-  },
+
+const tool = await database
+.collection("tools")
+.findOne({
+ _id:new ObjectId(id)
 });
 
 
-  } catch (error) {
 
-    console.error("Single Tool Error:", error);
+if(!tool){
+
+return res.status(404).json({
+success:false,
+message:"Tool not found"
+});
+
+}
 
 
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch tool",
-    });
 
-  }
+
+const reviews = await database
+.collection("reviews")
+.find({
+ toolId:id
+})
+.toArray();
+
+
+
+
+return res.status(200).json({
+
+success:true,
+
+data:{
+ ...tool,
+ reviews
+}
+
+});
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+
+return res.status(500).json({
+success:false,
+message:"Failed to fetch tool"
+});
+
+
+}
+
+
+};
+
+
+export const getToolReviews = async(
+req:Request,
+res:Response
+)=>{
+
+try{
+
+const {toolId}=req.params;
+
+
+console.log("Searching reviews for:",toolId);
+
+
+
+const reviews = await db()
+.collection("reviews")
+.find({
+ toolId: toolId
+})
+.toArray();
+
+
+
+console.log("Reviews found:",reviews);
+
+
+
+res.status(200).json({
+success:true,
+reviews
+});
+
+
+}catch(error){
+
+console.log(error);
+
+res.status(500).json({
+success:false,
+message:"Review fetch failed"
+});
+
+}
 
 };
