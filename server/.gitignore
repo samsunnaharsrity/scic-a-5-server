@@ -6,4 +6,5 @@ server/.env.*
 
 # dependencies
 node_modules/
+node_module
 server/node_modules/
