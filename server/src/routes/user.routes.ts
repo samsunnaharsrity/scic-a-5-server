@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { db } from "../config/mongodb";
+import { ObjectId } from "mongodb";
 
 const router = Router();
 
@@ -97,5 +98,214 @@ message:error.message
 
 });
 
+
+
+// GET ALL USERS
+
+router.get("/", async(req,res)=>{
+
+try{
+
+
+const users =
+await db()
+.collection("user")
+.find({})
+.sort({
+createdAt:-1
+})
+.toArray();
+
+
+
+const formattedUsers = users.map(user=>({
+
+_id:user._id,
+
+name:user.name || "Unknown",
+
+email:user.email,
+
+image:user.image || null,
+
+
+role:user.role || "user",
+
+status:
+user.banned
+?
+"Blocked"
+:
+"Active",
+
+
+plan:user.plan || "free",
+
+createdAt:user.createdAt
+
+
+}));
+
+
+
+
+res.json({
+
+success:true,
+
+data:formattedUsers
+
+});
+
+
+}
+catch(error:any){
+
+
+console.log(error);
+
+
+res.status(500).json({
+
+success:false,
+
+message:error.message
+
+});
+
+
+}
+
+
+});
+
+
+// UPDATE USER ROLE
+
+router.patch("/role/:id", async(req,res)=>{
+
+try{
+
+const {id}=req.params;
+
+const {role}=req.body;
+
+
+const result = await db()
+.collection("user")
+.updateOne(
+{
+_id:new ObjectId(id)
+},
+{
+$set:{
+role,
+updatedAt:new Date()
+}
+}
+);
+
+
+res.json({
+
+success:true,
+message:"Role updated",
+result
+
+});
+
+
+}
+catch(error:any){
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
+
+
+});
+
+
+
+// BLOCK / UNBLOCK USER
+
+router.patch("/ban/:id", async(req,res)=>{
+
+try{
+
+
+const {id}=req.params;
+
+const {banned}=req.body;
+
+
+
+const result = await db()
+.collection("user")
+.updateOne(
+
+{
+_id:new ObjectId(id)
+},
+
+{
+$set:{
+banned,
+updatedAt:new Date()
+}
+}
+
+);
+
+
+
+if(result.matchedCount===0){
+
+return res.status(404).json({
+
+success:false,
+message:"User not found"
+
+});
+
+}
+
+
+
+res.json({
+
+success:true,
+message:
+banned
+?
+"User blocked"
+:
+"User unblocked"
+
+});
+
+
+}
+catch(error:any){
+
+console.log(error);
+
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+
+}
+
+});
 
 export default router;

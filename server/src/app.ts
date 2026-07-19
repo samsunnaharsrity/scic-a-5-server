@@ -8,6 +8,9 @@ import settingsRoute from "./routes/settings.route";
 import agentRoutes from "./routes/agent.route";
 import dashboardRouter from "./routes/userDashboard.routes";
 import adminSettingsRoute from "./routes/adminSettings.route";
+import trainingRoute from "./routes/training.route";
+import aiAnalyticsRoute from "./routes/aiAnalytics.route";
+import promptRoute from "./routes/prompt.route";
 
 
 
@@ -53,6 +56,28 @@ app.use(
 "/api/admin",
 adminSettingsRoute
 );
+
+
+
+app.use(
+"/api/training",
+trainingRoute
+);
+
+
+
+
+app.use(
+"/api/ai-analytics",
+aiAnalyticsRoute
+);
+
+
+app.use(
+"/api/prompts",
+promptRoute
+);
+
 
 
 app.get("/", (req, res) => {
