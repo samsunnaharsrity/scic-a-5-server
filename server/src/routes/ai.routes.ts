@@ -105,4 +105,70 @@ getControlCenter
 );
 
 
+// AI PLAYGROUND
+
+router.post("/playground", async (req, res) => {
+
+  try {
+
+    const { prompt, model } = req.body;
+
+
+    const completion =
+      await groq.chat.completions.create({
+
+        model: model || "llama-3.1-8b-instant",
+
+        messages: [
+
+          {
+            role: "system",
+            content: `
+You are an AI Playground assistant.
+
+Help users experiment with AI prompts.
+Give accurate and useful responses.
+`
+          },
+
+          {
+            role: "user",
+            content: prompt
+          }
+
+        ]
+
+      });
+
+
+    res.json({
+
+      result:
+      completion.choices[0].message.content
+
+    });
+
+
+  } catch(error:any){
+
+
+    console.error(
+      "Playground Error:",
+      error.message
+    );
+
+
+    res.status(500).json({
+
+      message:"AI Playground Failed",
+      error:error.message
+
+    });
+
+  }
+
+});
+
+
+
 export default router;
