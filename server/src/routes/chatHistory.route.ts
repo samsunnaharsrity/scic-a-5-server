@@ -9,6 +9,7 @@ const router = express.Router();
 
 
 
+// GET USER CHAT HISTORY
 router.get(
 "/chat-history/:email",
 getChatHistory
@@ -16,8 +17,9 @@ getChatHistory
 
 
 
+// DELETE SINGLE CHAT
 router.delete(
-"/chat-history/:email",
+"/chat-history/:id",
 deleteChatHistory
 );
 

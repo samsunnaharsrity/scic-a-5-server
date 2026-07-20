@@ -5,24 +5,24 @@ import { ObjectId } from "mongodb";
 
 // GET USER CHAT HISTORY
 export const getChatHistory = async(
-req:Request,
-res:Response
+req: Request,
+res: Response
 )=>{
 
+try{
 
-const email=req.params.email;
+const email = req.params.email;
 
 
 const chats = await db()
 .collection("chat_history")
 .find({
- userEmail:email
+  userEmail: email
 })
 .sort({
- createdAt:-1
+  createdAt:-1
 })
 .toArray();
-
 
 
 res.json({
@@ -33,31 +33,42 @@ chats
 });
 
 
+}
+catch(error:any){
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
+
 };
 
 
 
 
 
-
 // DELETE SINGLE CHAT
-
-export const deleteChatHistory = async(
-req:Request,
-res:Response
-)=>{
+export const deleteChatHistory = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
 
 try{
 
-const {email}=req.params;
+
+const { id } = req.params;
 
 
-if(!email){
+if(!id){
 
 return res.status(400).json({
 
 success:false,
-message:"Email required"
+message:"Chat id required"
 
 });
 
@@ -67,9 +78,9 @@ message:"Email required"
 
 const result = await db()
 .collection("chat_history")
-.deleteMany({
+.deleteOne({
 
-userEmail:email
+_id: new ObjectId(id)
 
 });
 
@@ -79,9 +90,9 @@ res.json({
 
 success:true,
 
-message:"All chats deleted",
+message:"Chat deleted successfully",
 
-deletedCount:result.deletedCount
+deletedCount: result.deletedCount
 
 });
 
@@ -90,6 +101,7 @@ deletedCount:result.deletedCount
 catch(error:any){
 
 console.log(error);
+
 
 res.status(500).json({
 

@@ -1,204 +1,5 @@
-// import { Request, Response } from "express";
-// import { db } from "../config/mongodb";
-
-
-// export const getUserAnalytics = async(
-// req:Request,
-// res:Response
-// )=>{
-
-// try{
-
-// const {email}=req.params;
-
-
-// const database=db();
-
-
-// // total requests
-
-// const totalRequests =
-// await database
-// .collection("ai_requests")
-// .countDocuments({
-//  userEmail:email
-// });
-
-
-
-// // chats
-
-// const chats =
-// await database
-// .collection("ai_requests")
-// .countDocuments({
-//  userEmail:email,
-//  type:"chat"
-// });
-
-
-
-// // agents
-
-// const agents =
-// await database
-// .collection("agents")
-// .countDocuments({
-//  userEmail:email
-// });
-
-
-
-
-// // tokens
-
-// const tokenData =
-// await database
-// .collection("ai_requests")
-// .aggregate([
-
-// {
-// $match:{
-// userEmail:email
-// }
-// },
-
-// {
-// $group:{
-// _id:null,
-// total:{
-// $sum:"$tokens"
-// }
-// }
-// }
-
-// ])
-// .toArray();
-
-
-
-// const tokens =
-// tokenData[0]?.total || 0;
-
-
-
-
-
-
-// // weekly usage
-
-// const weekly =
-// await database
-// .collection("ai_requests")
-// .aggregate([
-
-// {
-// $match:{
-// userEmail:email
-// }
-// },
-
-
-// {
-// $group:{
-// _id:"$day",
-// requests:{
-// $sum:1
-// }
-// }
-// }
-
-// ])
-// .toArray();
-
-
-
-
-
-
-// // tool usage
-
-// const tools =
-// await database
-// .collection("ai_requests")
-// .aggregate([
-
-// {
-// $match:{
-// userEmail:email
-// }
-// },
-
-// {
-// $group:{
-// _id:"$tool",
-// value:{
-// $sum:1
-// }
-// }
-
-// }
-
-// ])
-// .toArray();
-
-
-
-
-
-
-// res.json({
-
-// success:true,
-
-// stats:{
-// requests:totalRequests,
-// chats,
-// agents,
-// tokens
-// },
-
-
-// weekly:weekly.map(item=>({
-
-// day:item._id,
-// requests:item.requests
-
-// })),
-
-
-// tools:tools.map(item=>({
-
-// name:item._id,
-// value:item.value
-
-// }))
-
-
-// });
-
-
-
-// }catch(error){
-
-// console.log(error);
-
-// res.status(500).json({
-
-// success:false,
-// message:"Analytics error"
-
-// });
-
-
-// }
-
-
-// }
-
-
-import { Request, Response } from "express";
-import { db } from "../config/mongodb";
+import {Request,Response} from "express";
+import {db} from "../config/mongodb";
 
 
 export const getUserAnalytics = async(
@@ -208,74 +9,74 @@ res:Response
 
 try{
 
-const {email}=req.params;
+
+const email=req.params.email;
 
 
-const database = db();
-
-
-// AI REQUESTS
-
-const requests =
-await database
-.collection("ai_usage_logs")
-.countDocuments({
-userEmail:email
-});
+const database=db();
 
 
 
+// Agents count
 
-// CHAT COUNT
-
-const chats =
-await database
-.collection("ai_usage_logs")
-.countDocuments({
-
-userEmail:email,
-
-type:"chat"
-
-});
-
-
-
-
-// AGENTS
-
-const agents =
-await database
+const agents = await database
 .collection("agents")
 .countDocuments({
-
-userEmail:email
-
+ userEmail:email
 });
 
 
 
 
-// TOKENS
+// Chat count
 
-const tokenData =
-await database
-.collection("ai_usage_logs")
+const chats = await database
+.collection("chat_history")
+.countDocuments({
+ userEmail:email
+});
+
+
+
+
+// AI Requests
+
+const requests = await database
+.collection("ai_requests")
+.countDocuments({
+ userEmail:email
+});
+
+
+
+
+
+// Tokens
+
+const tokenData = await database
+.collection("ai_requests")
 .aggregate([
 
 {
-$match:{
-userEmail:email
-}
+ $match:{
+  userEmail:email
+ }
 },
 
 {
-$group:{
-_id:null,
-total:{
-$sum:"$tokens"
-}
-}
+ $group:{
+  _id:null,
+
+  total:{
+   $sum:{
+    $ifNull:[
+     "$tokens",
+     0
+    ]
+   }
+  }
+
+ }
 }
 
 ])
@@ -289,42 +90,162 @@ tokenData[0]?.total || 0;
 
 
 
+
+
+// Agent Create Trend
+
+const agentsUsage = await database
+.collection("agents")
+.aggregate([
+
+{
+ $match:{
+  userEmail:email
+ }
+},
+
+{
+ $group:{
+
+ _id:{
+  $dateToString:{
+   format:"%b %d",
+   date:{
+    $toDate:"$createdAt"
+   }
+  }
+ },
+
+ agents:{
+  $sum:1
+ }
+
+ }
+
+},
+
+{
+ $project:{
+  _id:0,
+  date:"$_id",
+  agents:1
+ }
+}
+
+])
+.toArray();
+
+
+
+
+
+
+
+// Chat Usage Pie
+
+const chatUsage = await database
+.collection("chat_history")
+.aggregate([
+
+{
+ $match:{
+  userEmail:email
+ }
+},
+
+
+{
+ $group:{
+
+ _id:{
+  $ifNull:[
+   "$tool",
+   "AI Chat"
+  ]
+ },
+
+
+ value:{
+  $sum:1
+ }
+
+ }
+
+},
+
+
+{
+ $project:{
+
+ _id:0,
+
+ name:"$_id",
+
+ value:1
+
+ }
+
+}
+
+
+])
+.toArray();
+
+
+
+
+
+
+
+
 res.json({
 
 success:true,
+
 
 stats:{
 
 
 requests,
 
-
 chats,
-
 
 agents,
 
+tokens,
 
-tokens
+
+},
 
 
-}
+agentsUsage,
+
+
+chatUsage
 
 
 });
 
 
-}
-catch(error){
 
-console.log(error);
+
+
+}
+catch(error:any){
+
+
+console.log(
+"ANALYTICS ERROR:",
+error
+);
+
 
 
 res.status(500).json({
 
 success:false,
 
-message:"Analytics error"
+message:error.message
 
 });
 

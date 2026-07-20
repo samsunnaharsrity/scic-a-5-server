@@ -15,6 +15,7 @@ import analyticsRoute from "./routes/analytics.route";
 import reviewRoutes from "./routes/review.routes";
 import templateRoutes from "./routes/template.route";
 import chatHistoryRoute from "./routes/chatHistory.route";
+import adminRoutes from "./routes/adminRoutes";
 
 
 
@@ -103,11 +104,14 @@ app.use(
 chatHistoryRoute
 );
 
-// app.use(
-// "/api",
-// templateRoutes
-// );
 
+app.use("/api/admin", adminRoutes)
+
+
+app.use(
+"/api",
+templateRoutes
+);
 
 app.get("/", (req, res) => {
   res.send("🚀 SCIC A-5 Server Running...");
