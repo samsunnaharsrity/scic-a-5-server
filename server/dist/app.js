@@ -16,9 +16,17 @@ const adminSettings_route_1 = __importDefault(require("./routes/adminSettings.ro
 const training_route_1 = __importDefault(require("./routes/training.route"));
 const aiAnalytics_route_1 = __importDefault(require("./routes/aiAnalytics.route"));
 const prompt_route_1 = __importDefault(require("./routes/prompt.route"));
+const analytics_route_1 = __importDefault(require("./routes/analytics.route"));
+const review_routes_1 = __importDefault(require("./routes/review.routes"));
+const template_route_1 = __importDefault(require("./routes/template.route"));
+const chatHistory_route_1 = __importDefault(require("./routes/chatHistory.route"));
+const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    origin: [
+        "http://localhost:3000",
+        "https://scic-a-5.vercel.app"
+    ],
     credentials: true,
 }));
 app.use(express_1.default.json());
@@ -33,6 +41,11 @@ app.use("/api/admin", adminSettings_route_1.default);
 app.use("/api/training", training_route_1.default);
 app.use("/api/ai-analytics", aiAnalytics_route_1.default);
 app.use("/api/prompts", prompt_route_1.default);
+app.use("/api/analytics", analytics_route_1.default);
+app.use("/api", review_routes_1.default);
+app.use("/api", chatHistory_route_1.default);
+app.use("/api/admin", adminRoutes_1.default);
+app.use("/api", template_route_1.default);
 app.get("/", (req, res) => {
     res.send("🚀 SCIC A-5 Server Running...");
 });

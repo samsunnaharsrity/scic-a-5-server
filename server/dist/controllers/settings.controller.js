@@ -5,7 +5,7 @@ const mongodb_1 = require("../config/mongodb");
 const getSettings = async (req, res) => {
     try {
         const settingsCollection = (0, mongodb_1.db)().collection("settings");
-        const { userId } = req.params;
+        const userId = decodeURIComponent(req.params.userId);
         let settings = await settingsCollection.findOne({
             userId
         });

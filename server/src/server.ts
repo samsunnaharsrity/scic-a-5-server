@@ -1,19 +1,36 @@
 import dotenv from "dotenv";
-import serverless from "serverless-http";
+dotenv.config();
+
 import app from "./app";
 import { connectDB } from "./config/mongodb";
 
-dotenv.config();
 
-let connected = false;
+const PORT = process.env.PORT || 8000;
 
-const handler = serverless(app);
 
-export default async function (req: any, res: any) {
-  if (!connected) {
-    await connectDB();
-    connected = true;
-  }
+const startServer = async()=>{
 
-  return handler(req, res);
+try{
+
+await connectDB();
+
+
+app.listen(PORT,()=>{
+
+console.log(
+`🚀 Server running on http://localhost:${PORT}`
+);
+
+});
+
+
+}catch(error){
+
+console.error(error);
+
 }
+
+};
+
+
+startServer();

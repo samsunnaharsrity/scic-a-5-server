@@ -47,8 +47,10 @@ exports.createAgent = createAgent;
 // Get User Agents
 const getMyAgents = async (req, res) => {
     try {
-        const email = decodeURIComponent(req.params.email);
-        const agents = await (0, mongodb_1.db)()
+        const { email } = req.params;
+        console.log("REQUEST EMAIL:", email);
+        const database = (0, mongodb_1.db)();
+        const agents = await database
             .collection("agents")
             .find({
             userEmail: email
@@ -57,13 +59,14 @@ const getMyAgents = async (req, res) => {
             createdAt: -1
         })
             .toArray();
+        console.log("FOUND AGENTS:", agents);
         res.json({
             success: true,
             agents
         });
     }
     catch (error) {
-        console.log(error);
+        console.log("GET MY AGENTS ERROR:", error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -91,7 +94,7 @@ exports.getAllAgents = getAllAgents;
 // UPDATE AGENT
 const updateAgent = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         console.log("UPDATE ID:", id);
         if (!mongodb_2.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -130,7 +133,7 @@ exports.updateAgent = updateAgent;
 // DELETE AGENT
 const deleteAgent = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = String(req.params.id);
         console.log("DELETE ID:", id);
         if (!mongodb_2.ObjectId.isValid(id)) {
             return res.status(400).json({

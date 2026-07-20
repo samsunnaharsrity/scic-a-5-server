@@ -3,27 +3,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getControlCenter = exports.generateContent = exports.chatAI = void 0;
 const generative_ai_1 = require("@google/generative-ai");
 const groq_service_1 = require("../services/groq.service");
+const mongodb_1 = require("../config/mongodb");
 const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.OPENAI_API_KEY);
 const chatAI = async (req, res) => {
     try {
-        console.log("Body:", req.body);
-        console.log("API KEY:", process.env.GEMINI_API_KEY);
-        const { message } = req.body;
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash",
+        console.log("BODY:", req.body);
+        const { message, email } = req.body;
+        console.log("EMAIL:", email);
+        const reply = await (0, groq_service_1.generateAI)(message);
+        console.log("AI REPLY GENERATED");
+        const saved = await (0, mongodb_1.db)()
+            .collection("chat_history")
+            .insertOne({
+            userEmail: email,
+            title: message.slice(0, 40),
+            message: reply,
+            tool: "AI Chat Assistant",
+            createdAt: new Date()
         });
-        const result = await model.generateContent(message);
-        const reply = result.response.text();
+        console.log("SAVED:", saved);
         res.json({
             success: true,
-            reply,
+            reply
         });
     }
     catch (error) {
-        console.error("Gemini Error:", error);
+        console.log("ERROR:", error);
         res.status(500).json({
-            success: false,
-            error: error instanceof Error ? error.message : String(error),
+            success: false
         });
     }
 };

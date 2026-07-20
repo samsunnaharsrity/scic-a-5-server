@@ -2,74 +2,93 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadTrainingFile = exports.getTrainingData = void 0;
 const mongodb_1 = require("../config/mongodb");
-// GET TRAINING DATA
+// ================= GET TRAINING DATA =================
 const getTrainingData = async (req, res) => {
     try {
         const { email } = req.params;
-        let training = await (0, mongodb_1.db)()
-            .collection("training")
-            .findOne({
+        const collection = (0, mongodb_1.db)().collection("training");
+        let training = await collection.findOne({
             userEmail: email
         });
         if (!training) {
-            training = {
+            const newTraining = {
                 userEmail: email,
                 files: [],
                 trainedAgents: 0,
                 accuracy: 0,
                 progress: 0,
-                lastTraining: null
+                lastTraining: null,
+                updatedAt: new Date()
             };
-            await (0, mongodb_1.db)()
-                .collection("training")
-                .insertOne(training);
+            await collection.insertOne(newTraining);
+            training = {
+                ...newTraining
+            };
         }
         res.json(training);
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({
             message: error.message
         });
     }
 };
 exports.getTrainingData = getTrainingData;
-// Upload Training File
+// ================= UPLOAD TRAINING FILE =================
 const uploadTrainingFile = async (req, res) => {
     try {
+        const fileReq = req;
+        console.log("BODY:", req.body);
+        console.log("FILE:", fileReq.file);
         const { email } = req.body;
-        if (!req.file) {
+        if (!fileReq.file) {
             return res.status(400).json({
                 message: "No file uploaded"
             });
         }
-        const file = {
-            name: req.file.originalname,
-            type: req.file.mimetype,
-            size: req.file.size,
-            path: req.file.path,
+        const uploadedFile = {
+            name: fileReq.file.originalname,
+            type: fileReq.file.mimetype,
+            size: fileReq.file.size,
+            path: fileReq.file.path,
             uploadedAt: new Date()
         };
-        await (0, mongodb_1.db)()
-            .collection("training")
-            .updateOne({
+        const collection = (0, mongodb_1.db)().collection("training");
+        const existing = await collection.findOne({
             userEmail: email
-        }, {
-            $push: {
-                files: file
-            },
-            $set: {
+        });
+        if (!existing) {
+            await collection.insertOne({
+                userEmail: email,
+                files: [uploadedFile],
+                trainedAgents: 0,
+                accuracy: 0,
+                progress: 0,
+                lastTraining: null,
                 updatedAt: new Date()
-            }
-        }, {
-            upsert: true
+            });
+        }
+        else {
+            await collection.updateOne({
+                userEmail: email
+            }, {
+                $push: {
+                    files: uploadedFile
+                },
+                $set: {
+                    updatedAt: new Date()
+                }
+            });
+        }
+        const updated = await collection.findOne({
+            userEmail: email
         });
-        res.json({
-            success: true,
-            message: "File uploaded",
-            file
-        });
+        console.log("UPDATED:", updated);
+        res.json(updated);
     }
     catch (error) {
+        console.log("UPLOAD ERROR:", error);
         res.status(500).json({
             message: error.message
         });

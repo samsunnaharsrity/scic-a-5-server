@@ -3,20 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+const serverless_http_1 = __importDefault(require("serverless-http"));
 const app_1 = __importDefault(require("./app"));
 const mongodb_1 = require("./config/mongodb");
-const PORT = process.env.PORT || 8000;
-const startServer = async () => {
-    try {
+dotenv_1.default.config();
+let connected = false;
+const handler = (0, serverless_http_1.default)(app_1.default);
+async function default_1(req, res) {
+    if (!connected) {
         await (0, mongodb_1.connectDB)();
-        app_1.default.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
-        });
+        connected = true;
     }
-    catch (error) {
-        console.error(error);
-    }
-};
-startServer();
+    return handler(req, res);
+}

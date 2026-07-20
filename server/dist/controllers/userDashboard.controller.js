@@ -13,9 +13,7 @@ const getDashboard = async (req, res) => {
         });
         const agents = await database
             .collection("agents")
-            .countDocuments({
-            userEmail: email
-        });
+            .countDocuments();
         const requests = await database
             .collection("ai_requests")
             .countDocuments({
@@ -23,10 +21,11 @@ const getDashboard = async (req, res) => {
         });
         const recentAgents = await database
             .collection("agents")
-            .find({ userEmail: email })
+            .find({})
             .sort({ createdAt: -1 })
             .limit(5)
             .toArray();
+        console.log("RECENT AGENTS:", recentAgents);
         const activities = recentAgents.map((agent) => ({
             _id: agent._id,
             title: agent.name,
