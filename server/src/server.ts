@@ -1,22 +1,62 @@
 import dotenv from "dotenv";
-dotenv.config();
-
+import serverless from "serverless-http";
 
 import app from "./app";
 import { connectDB } from "./config/mongodb";
 
-const PORT = process.env.PORT || 8000;
 
-const startServer = async () => {
+dotenv.config();
+
+
+let connected = false;
+
+
+const handler = serverless(app);
+
+
+export default async function (
+  req: any,
+  res: any
+) {
+
   try {
-    await connectDB();
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
+    if (!connected) {
+
+      await connectDB();
+
+      connected = true;
+
+      console.log("✅ MongoDB Connected");
+
+    }
+
+
+    return handler(req, res);
+
+
   } catch (error) {
-    console.error(error);
-  }
-};
 
-startServer();
+
+    console.error(
+      "❌ Serverless Error:",
+      error
+    );
+
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:"Server Error",
+
+      error:
+      error instanceof Error
+      ? error.message
+      : error
+
+    });
+
+  }
+
+}

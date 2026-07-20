@@ -23,7 +23,8 @@
     "mongodb": "^7.5.0",
     "mongoose": "^9.7.4",
     "multer": "^2.2.0",
-    "openai": "^6.48.0"
+    "openai": "^6.48.0",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
