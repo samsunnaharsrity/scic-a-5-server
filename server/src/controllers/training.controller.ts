@@ -138,7 +138,7 @@ mimetype:string;
 
 size:number;
 
-path:string;
+buffer:Buffer;
 
 }
 
@@ -171,17 +171,15 @@ message:"No file uploaded"
 
 const uploadedFile:UploadedFile={
 
-
 name:fileReq.file.originalname,
 
 type:fileReq.file.mimetype,
 
 size:fileReq.file.size,
 
-path:fileReq.file.path,
+path:"memory",
 
 uploadedAt:new Date()
-
 
 };
 
