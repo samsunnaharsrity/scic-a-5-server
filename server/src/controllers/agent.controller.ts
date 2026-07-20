@@ -19,7 +19,10 @@ description,
 category,
 model,
 prompt,
-userEmail
+userEmail,
+status,
+tasks,
+icon
 }=req.body;
 
 
@@ -38,6 +41,11 @@ description,
 category,
 model,
 prompt,
+
+status,
+tasks,
+icon,
+
 userEmail,
 
 createdAt:new Date()
