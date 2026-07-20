@@ -8,10 +8,10 @@ import {
 
 
 const router = Router();
-
+const storage = multer.memoryStorage()
 
 const upload = multer({
-    dest:"uploads/"
+    storage,
 });
 
 
