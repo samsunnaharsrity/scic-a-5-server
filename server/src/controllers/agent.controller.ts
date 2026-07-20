@@ -126,7 +126,10 @@ const database = db();
 const agents = await database
 .collection("agents")
 .find({
- userEmail: email
+ userEmail:{
+   $regex:`^${email}$`,
+   $options:"i"
+ }
 })
 .sort({
  createdAt:-1
