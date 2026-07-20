@@ -115,8 +115,7 @@ res: Response
 
 try{
 
-const {email}=req.params;
-
+const email = decodeURIComponent(req.params.email);
 
 console.log("REQUEST EMAIL:", email);
 
